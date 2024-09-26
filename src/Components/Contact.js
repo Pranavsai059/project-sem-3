@@ -1,106 +1,98 @@
-// CustomSlider.js
-import React, { useState } from 'react';
-import './CustomSlider.css'; // Import your custom CSS file
-import Navbar2 from './Navbar2';
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import complaint from '../Assets/complaint.png';
-import docs from '../Assets/docs.png'
-import KYR from '../Assets/KYR.png'
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import React, {useState } from 'react';
+import axios from 'axios';
+import Navbar2 from './Navbar3'
+import Footer from './Footer'
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
-const CustomSlider = () => {
-    const slidesToShow = 3;
-    const [startIndex, setStartIndex] = useState(0);
-    const { t } = useTranslation();
+import './FeedbackForm.css'; // Import the CSS file
 
-    const workInfoData = [
-        {
-            title : t('Useful.Lang'),
-            text : t('Useful.Lang2'),
-            image: complaint,
-            link: '/'
-        },
-        {
-            image: docs ,
-            title : t('Useful.Dom'),
-            text : t('Useful.Lang2'),
-            link: '/'
-        },
-        {
-            image: KYR,
-            title : t('Useful.Sol'),
-            text : t('Useful.Lang2'),
-            link: '/'
-        },
-        {
-            title: 'Card 4',
-            text: 'This is the content for card 4. Add your own text here.',
-            image: 'https://via.placeholder.com/300',
-            link: '/'
-        },     
-        {
-            title: 'Card 5',
-            text: 'This is the content for card 4. Add your own text here.',
-            image: 'https://via.placeholder.com/300',
-            link: '/'
-        }, 
-        {
-            title: 'Card 6',
-            text: 'This is the content for card 4. Add your own text here.',
-            image: 'https://via.placeholder.com/300',
-            link:'/'
-        }, 
-    ];
+const Contact = () => {
+  const [openAlert, setOpenAlert] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    mobile: '',
+    feedback: ''
+  });
 
-    const handlePrev = () => {
-        const step = 3;
-        let newIndex = startIndex - step;
-        if (newIndex < 0) {
-            newIndex = workInfoData.length - slidesToShow;
-        }
-        setStartIndex(newIndex);
-    };
-    
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
-    const handleNext = () => {
-        const step = 3;
-        let newIndex = startIndex + step;
-        if (newIndex > workInfoData.length - slidesToShow) {
-            newIndex = 0;
-        }
-        setStartIndex(newIndex);
-    };
-    
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:5500/storeFeedback', formData);
+      setFormData({
+        name: '',
+        mobile: '',
+        feedback: ''
+      });
+      setOpenAlert(true)
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      alert('Error submitting feedback. Please try again later.');
+    }
+  };
 
-    return (
-        <div>
-            <Navbar2 />
-            <div className="custom-slider">
-                <div className='useful-section-top'>
-                    <p className='primary-heading'>{t('Useful.How')}</p>
-
-                 </div>
-                <div className="slider-container">
-                    {workInfoData.slice(startIndex, startIndex + slidesToShow).map((data, index) => (
-                        <div key={index} className="slide"><Link to={data.link} className='link-in-buttons'>
-                            <div className="image-container">
-                                <img src={data.image} alt={`Slide ${index + 1}`} />
-                            </div>
-                            <h2>{data.title}</h2>
-                            </Link></div>
-                    ))}
-                </div>
-                <button className="prev-button" onClick={handlePrev}>
-                    <ArrowCircleLeftIcon fontSize="large" />
-                </button>
-                <button className="next-button" onClick={handleNext}>
-                    <ArrowCircleRightIcon fontSize="large" />
-                </button>
-            </div>
-        </div>
-    );
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
 };
 
-export default CustomSlider;
+  return (
+    <div>
+      <Navbar2 />
+      <div className='contact-container'>
+      <div className='image-contact'>
+      <h1 style={{textAlign:"center"}}>Reach out to us!</h1>
+    <div className="feedback-form-container">
+      <h2>Get In Touch With Us</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="mobile">Mobile:</label>
+          <input
+            type="text"
+            id="mobile"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="feedback">Message:</label>
+          <textarea
+            id="feedback"
+            name="feedback"
+            value={formData.feedback}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit" >Submit</button>
+      </form>
+    </div>
+    </div>
+    </div>
+    <h1 className='primary-heading'>Meet the team :</h1>
+    <h2 className='primary-text'>Mentored by Dr. R Madhavi,</h2>
+    </div>
+  );
+};
+
+export default Contact;

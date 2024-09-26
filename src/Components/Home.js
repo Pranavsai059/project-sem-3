@@ -1,14 +1,17 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 import Navbar from './Navbar'
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import About from './About';
+import Connect from './Connect';
 import Work from './Work';
 import CustomSlider from './CustomSlider';
 import Footer from './Footer';
-import { Link } from 'react-router-dom';
 import { useRef } from 'react';
 import PopupComponent from './Popup';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+
 
 
 
@@ -16,7 +19,11 @@ import PopupComponent from './Popup';
 const Home = () => {
     const { t,i18n } = useTranslation();
     const aboutRef = useRef(null);//autoscroll
-
+    const [openAlert, setOpenAlert] = useState(false);
+    
+    const redirect = () => {
+        window.location.href = '/GetStarted';
+      };
     const scrollToAbout = () => {
         if (aboutRef.current) {
           aboutRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -27,8 +34,18 @@ const Home = () => {
     const [animateHeader, setAnimateHeader] = useState(false);
     const handleLanguageChange = (language) => {
         i18n.changeLanguage(language);
-        setAnimateHeader(true);      };
-    
+        setAnimateHeader(true); 
+        setOpenAlert(true);
+    };
+    const handleCloseAlert = () => {
+      setOpenAlert(false);
+  };
+  useEffect(() => {
+    console.log("Component mounted, scrolling to top");
+    window.scrollTo(0, 0);
+}, []);
+
+
   return (
     <div className='home-container'>
         <Navbar scrollToAbout={scrollToAbout} /> 
@@ -43,18 +60,21 @@ const Home = () => {
                 <p className='primary-text'>
                     {t('Home.Legal')}
                 </p>
-                
-                    <button className='secondary-button'>
-                        <Link to='/GetStarted' className='link-in-buttons'>
+                    <button className='secondary-button' onClick={redirect}>
                         {t('Home.GS')}
-                        </Link>
                     </button>
               </div>
         </div>
         <Work/>
         <About ref={aboutRef}/>
         <CustomSlider/>
-        <Footer/>    
+        <Connect/>
+        <Footer/>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="success">
+                    Language Changed!
+                </Alert>
+            </Snackbar>    
 </div>
   )
 }
